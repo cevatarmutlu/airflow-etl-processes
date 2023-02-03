@@ -62,19 +62,19 @@ def create_sales_tx_t_as_pandas_dataframe(row_number, sales_id_array, store_id_a
 
 if __name__ == '__main__':
 
-    customer_count = 200
+    customer_count = 250
     store_count = 20
-    sales_count = 5000
+    sales_count = 75000
     if_exits = "append" # fail, replace
 
-    user = "iyzico"
-    password = "iyzico"
-    database = "iyzico"
+    user = "source"
+    password = "source"
+    database = "source"
     host = "localhost"
-    port = "5432"
+    port = "8000"
 
     engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}')
-    schema = "public"
+    schema = "tables"
 
     sales_t = create_sales_t_as_pandas_dataframe(
         row_number=sales_count,

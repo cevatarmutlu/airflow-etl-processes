@@ -72,9 +72,9 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
-    source:
-      condition: service_healthy
     target:
+      condition: service_healthy
+    source:
       condition: service_healthy
 
 services:
@@ -97,10 +97,12 @@ services:
       POSTGRES_USER: source
       POSTGRES_PASSWORD: source
       POSTGRES_DB: source
+    ports:
+      - 8000:5432
     volumes:
       - postgres-source-db-volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "source"]
       interval: 5s
       retries: 5
   
@@ -110,10 +112,12 @@ services:
       POSTGRES_USER: target
       POSTGRES_PASSWORD: target
       POSTGRES_DB: target
+    ports:
+      - 8001:5432
     volumes:
       - postgres-target-db-volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "target"]
       interval: 5s
       retries: 5
 

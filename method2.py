@@ -1,41 +1,10 @@
-from airflow.decorators import dag, task_group, task
+from airflow.decorators import dag
+from airflow.operators.dummy import DummyOperator
 from datetime import datetime
-import pandas as pd
 from method_2.extract import get_extract_tasks_as_dict
 from method_2.transform import *
 from method_2.load import get_laod_task_as_dict
-import subprocess
-import logging
-
-
-@task
-def start():
-    process = subprocess.Popen(["df", "-H"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-
-    out, err = process.communicate()
-    logging.info("\n" + out.decode("utf-8"))
-
-
-
-@task
-def healt_check(engine):
-
-    for table in ["public.sales_tx_t", "public.sales_t", "public.store_t", "data_marts.accounting_unit_data_mart", "data_marts.marketing_unit_data_mart"]:
-
-        data = pd.read_sql(
-            sql=f"SELECT * FROM {table}",
-            con=engine
-        )
-
-        logging.info(f"{table} rows: {len(data.index)}")
-    
-    process = subprocess.Popen(["df", "-H"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-
-    out, err = process.communicate()
-    logging.info("\n" + out.decode("utf-8"))
-
+from method_2.utils import *
 
 
 @dag(
@@ -66,8 +35,9 @@ def dag():
     }
     
     load_task = get_laod_task_as_dict(transform_task, engine)
+    healt = healt_check(engine)
 
     start_task >> list(extract_tasks_dict.values())
-    load_task >> healt_check(engine)
+    load_task >> healt >> DummyOperator(task_id="end")
 
 dag()

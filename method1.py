@@ -27,7 +27,8 @@ def dag():
     for key, value in json.loads(Variable.get('method1_etl_configs')).items():
         tasks.append(etl_task_group(key, value, engine))
 
-    
-    start >> tasks >> healt_check(engine) >> DummyOperator(task_id="end")
+    healt = healt_check(engine)
+
+    start >> tasks >> healt >> DummyOperator(task_id="end")
 
 dag()

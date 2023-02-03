@@ -1,0 +1,6 @@
+{
+    "iyzico_etl_source_connection_id": "iyzico_source",
+    "iyzico_etl_target_connection_id": "iyzico_target",
+    "method2_extract_tables": "sales_tx_t, sales_t, store_t",
+    "method2_transformed_table_names": "accounting_unit_data_mart, marketing_unit_data_mart"
+}

@@ -16,7 +16,7 @@ def truncate_or_create(engine, schema, table, columns):
     return True
 
 @task
-def extract_transform(engine, query, truncate_or_create_task):
+def extract_transform(engine, query):
 
     data = pd.read_sql(
         sql=query,
@@ -38,6 +38,8 @@ def load(data, engine, write_schema, write_table):
 
 @task
 def healt_check(engine):
+    import logging
+    import subprocess
 
     for table in ["public.sales_tx_t", "public.sales_t", "public.store_t", "data_marts.accounting_unit_data_mart", "data_marts.marketing_unit_data_mart"]:
 
@@ -54,10 +56,13 @@ def healt_check(engine):
     out, err = process.communicate()
     logging.info("\n" + out.decode("utf-8"))
 
+
 def etl_task_group(key, value, engine):
     with TaskGroup(key) as tg:
         truncate_or_create_task = truncate_or_create(engine, value.get("write_schema"), value.get("write_table"), value.get("columns"))
-        data = extract_transform(engine, value.get("query"), truncate_or_create_task)
-        load(data, engine, value.get("write_schema"), value.get("write_table"))
+        data = extract_transform(engine, value.get("query"))
+        load_task = load(data, engine, value.get("write_schema"), value.get("write_table"))
+
+        truncate_or_create_task >> data >> load_task
     
     return tg

@@ -1,30 +1,26 @@
-from airflow.decorators import dag, task_group, task
+from airflow.decorators import task
 import pandas as pd
 import logging
-from airflow.hooks.base import BaseHook
-from sqlalchemy import create_engine
 from airflow.models import Variable
 
 
-def get_extract_tasks_as_dict():
-    db = BaseHook.get_connection(Variable.get("iyzico_etl_source_connection_id"))
-    engine = create_engine(f'postgresql+psycopg2://{db.login}:{db.password}@{db.host}:{db.port}/{db.schema}')
-
+def get_extract_tasks_as_dict(engine):
+    
     extract_tasks = {}
 
-    for table_x in Variable.get("method2_extract_tables").split(","):
-        @task(task_id=f"extract_{table_x.strip()}")
+    for table_name in Variable.get("method2_extract_tables").split(","):
+        @task(task_id=f"extract_{table_name.strip().replace('.', '_')}")
         def extract(table, engine):
             data = pd.read_sql(
-                sql=f"SELECT * FROM {table.strip()}",
+                sql=f"SELECT * FROM {table}",
                 con=engine
             )
 
-            logging.info(f"Read table: {table.strip()}")
-            logging.info(f"Row number of {table.strip()}: {len(data.index)}")
+            logging.info(f"Read table: {table}")
+            logging.info(f"Row number of {table}: {len(data.index)}")
 
             return data.to_json(orient="table")
         
-        extract_tasks[table_x.strip()] = extract(table_x, engine)
+        extract_tasks[table_name.strip().replace(".", "_")] = extract(table_name.strip(), engine)
     
     return extract_tasks

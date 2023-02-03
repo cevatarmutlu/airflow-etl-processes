@@ -5,7 +5,6 @@ import logging
 @task
 def start():
     process = subprocess.Popen(["df", "-H"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
 
     out, err = process.communicate()
     logging.info("\n" + out.decode("utf-8"))

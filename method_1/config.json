@@ -1,18 +1,18 @@
 {
     "method1_etl_configs" : {
         "accounting_unit_data_mart": {
-        "query": "select st.paid_price, CAST(st.create_date as DATE) from sales_tx_t stt left join sales_t st on stt.sales_id = st.id where stt.status = true;",
-        "write_schema": "data_marts",
-        "write_table": "accounting_unit_data_mart",
-        "columns": "CREATE_DATE TIMESTAMP NOT null, PAID_PRICE NUMERIC(10, 2) NOT NULL"
+            "query": "select st.paid_price, CAST(st.create_date as DATE) from sales_tx_t stt left join sales_t st on stt.sales_id = st.id where stt.status = true;",
+            "write_schema": "data_marts",
+            "write_table": "accounting_unit_data_mart",
+            "columns": "CREATE_DATE TIMESTAMP NOT null, PAID_PRICE NUMERIC(10, 2) NOT NULL"
         },
         "marketing_unit_data_mart": {
-        "query": "select st.name store_name, st.status store_status, st2.create_date sales_date, st2.paid_price sales_price from sales_tx_t stt left join store_t st on stt.store_id = st.id left join sales_t st2 on stt.sales_id = st2.id where stt.status = true",
-        "write_schema": "data_marts",
-        "write_table": "marketing_unit_data_mart",
-        "columns": "store_name VARCHAR(250) NOT NULL, store_status BOOL NOT null, sales_date TIMESTAMP NOT null, sales_price NUMERIC(10, 2) NOT NULL"
+            "query": "select st.name store_name, st.status store_status, st2.create_date sales_date, st2.paid_price sales_price from sales_tx_t stt left join store_t st on stt.store_id = st.id left join sales_t st2 on stt.sales_id = st2.id where stt.status = true",
+            "write_schema": "data_marts",
+            "write_table": "marketing_unit_data_mart",
+            "columns": "store_name VARCHAR(250) NOT NULL, store_status BOOL NOT null, sales_date TIMESTAMP NOT null, sales_price NUMERIC(10, 2) NOT NULL"
         }
     },
-    "iyzico_etl_source_connection_id": "iyzico_source",
-    "iyzico_etl_target_connection_id": "iyzico_target"
+    "source_connection": "iyzico_source",
+    "target_connection": "iyzico_target"
 }

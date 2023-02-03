@@ -1,6 +1,11 @@
 {
-    "iyzico_etl_source_connection_id": "iyzico_source",
-    "iyzico_etl_target_connection_id": "iyzico_target",
-    "method2_extract_tables": "sales_tx_t, sales_t, store_t",
-    "method2_transformed_table_names": "accounting_unit_data_mart, marketing_unit_data_mart"
+    "source_connection": "iyzico_source",
+    "target_connection": "iyzico_target",
+    "method2_extract_tables": "public.sales_tx_t, public.sales_t, public.store_t, public.customer_t",
+    "method2_transformed_table_names": "data_marts.accounting_unit_data_mart, data_marts.marketing_unit_data_mart, data_marts.customer_unit_data_mart",
+    "method2_transform_mapping": {
+        "data_marts.accounting_unit_data_mart": "public.sales_tx_t, public.sales_t",
+        "data_marts.marketing_unit_data_mart": "public.sales_tx_t, public.sales_t, public.store_t",
+        "data_marts.customer_unit_data_mart": "public.customer_t"
+    }
 }

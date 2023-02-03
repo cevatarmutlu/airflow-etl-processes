@@ -1,43 +1,46 @@
 from airflow.decorators import dag
-from airflow.operators.dummy import DummyOperator
+from airflow.operators.empty import EmptyOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.models import Variable
+import json
 from datetime import datetime
+
 from method_2.extract import get_extract_tasks_as_dict
 from method_2.transform import *
-from method_2.load import get_laod_task_as_dict
+from method_2.load import load_tasks
 from method_2.utils import *
-
+from method_2.truncate import truncate_tasks
 
 @dag(
     dag_id="Iyzico_etl_method2",
-    schedule=None, #"*/20 * * * *", 
-    tags=["Iyzico", "etl"],
-    start_date=datetime(2020, 2, 2)
+    schedule="*/20 * * * *", 
+    tags=["Iyzico", "etl", "method2"],
+    start_date=datetime(2023, 2, 2)
 )
 def dag():
-    from airflow.hooks.base import BaseHook
-    from sqlalchemy import create_engine
-    from airflow.models import Variable
 
-    db = BaseHook.get_connection(Variable.get("iyzico_etl_source_connection_id"))
-    engine = create_engine(f'postgresql+psycopg2://{db.login}:{db.password}@{db.host}:{db.port}/{db.schema}')
+    engine = PostgresHook(Variable.get("source_connection")).get_sqlalchemy_engine()
     
 
     start_task = start()
 
-    extract_tasks_dict = get_extract_tasks_as_dict()
+    extract_tasks_dict = get_extract_tasks_as_dict(engine)
 
-    # Transform
-    accounting = transform_accounting_unit_data_mart(**extract_tasks_dict)
-    marketing = transform_marketing_unit_data_mart(**extract_tasks_dict)
-    transform_task = {
-        "accounting_unit_data_mart": accounting,
-        "marketing_unit_data_mart": marketing
-    }
+    tasks = []
+    for key, value in json.loads(Variable.get("method2_transform_mapping")).items():
+        print(key, value.split(","))
+        transformed_data = transforms_tasks[key.strip()](*[extract_tasks_dict[i.strip().replace(".", "_")] for i in value.split(",")])
+        truncate_task = truncate_tasks[key.strip()](engine, key.strip(), transformed_data)
+        load_task_result = load_tasks[key.strip()](truncate_task, engine, key.strip())
+        
+        tasks.append(load_task_result)
+
     
-    load_task = get_laod_task_as_dict(transform_task, engine)
     healt = healt_check(engine)
 
     start_task >> list(extract_tasks_dict.values())
-    load_task >> healt >> DummyOperator(task_id="end")
+    tasks >> healt >> EmptyOperator(task_id="end")
 
 dag()
+
+

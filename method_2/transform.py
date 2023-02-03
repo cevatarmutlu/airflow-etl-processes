@@ -1,9 +1,9 @@
-from airflow.decorators import dag, task_group, task
+from airflow.decorators import task
 import pandas as pd
 import logging
 
 @task
-def transform_accounting_unit_data_mart(sales_tx_t, sales_t, store_t = None):
+def transform_accounting_unit_data_mart(sales_tx_t, sales_t):
     sales_tx_t = pd.read_json(sales_tx_t, orient="table")
     sales_t = pd.read_json(sales_t, orient="table")
 
@@ -37,3 +37,13 @@ def transform_marketing_unit_data_mart(sales_tx_t, sales_t, store_t):
     logging.info(f"Row number of transformed table marketing_unit_data_mart: {len(df.index)}")
 
     return df.to_json(orient="table")
+
+@task
+def transform_customer_unit_data_mart(customer_t):
+    return customer_t
+
+transforms_tasks = {
+    "data_marts.accounting_unit_data_mart": transform_accounting_unit_data_mart,
+    "data_marts.marketing_unit_data_mart": transform_marketing_unit_data_mart,
+    "data_marts.customer_unit_data_mart": transform_customer_unit_data_mart
+}

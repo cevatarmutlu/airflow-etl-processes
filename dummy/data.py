@@ -36,7 +36,7 @@ def create_sales_tx_t_as_pandas_dataframe(row_number, sales_id_array, store_id_a
     }).astype({"status": bool})
 
 
-def create_dummy_data(db_params, schema, customer_count, store_count, sales_count, if_exits):
+def create_dummy_data(db_params, schema, customer_count, store_count, sales_count, if_exits = "append"):
     engine = create_engine(URL.create(
         "postgresql+psycopg2",
         **db_params

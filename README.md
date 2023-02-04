@@ -108,6 +108,32 @@ Benzer şekilde target database'ini ekleyiniz. Target database için bilgiler:
 * Password: target
 * Port: 8001
 
+## Dummy verinin oluşturulması
+
+Dummy veri oluşturmak için `dummy_data.py` script'ini çalıştırmanız yeterlidir. Aşağıdaki parametrelere dokunmasanıza gerek yoktur.
+
+```
+python3 dummy_data.py
+```
+
+### dummy_data.py parametreleri
+
+```python
+customer_count = 2500 # custormer_t tablosundaki satır sayısı. Müşteri sayısı.
+store_count = 50 # store_t tablosundaki satır sayısı. Mağaza sayısı.
+sales_count = 20000 # sales_tx_t, sales_t tablesundaki satır sayısı. Ürün satın alma sayısı
+
+db_params = {
+    "username": "source",
+    "password": "source",
+    "database": "source",
+    "host": "localhost",
+    "port": "8000"
+}
+
+schema = "public" # veri yazılacak database'in şemasının adı
+```
+
 
 ## Method1
 

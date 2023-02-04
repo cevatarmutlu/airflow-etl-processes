@@ -12,9 +12,9 @@ from method_2.utils import *
 from method_2.truncate import truncate_tasks
 
 @dag(
-    dag_id="Iyzico_etl_method2",
+    dag_id="etl_method2",
     schedule="*/20 * * * *", 
-    tags=["Iyzico", "etl", "method2"],
+    tags=["etl", "method2"],
     start_date=datetime(2023, 2, 2)
 )
 def dag():

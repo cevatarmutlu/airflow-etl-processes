@@ -162,4 +162,7 @@ cython_debug/
 #.idea/
 
 logs/*
+!logs/.gitkeep
+
 plugins/*
+!plugins/.gitkeep

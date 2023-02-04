@@ -13,7 +13,8 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 )
 def dag():
 
-    engine = PostgresHook(Variable.get("source_connection")).get_sqlalchemy_engine()
+    engine_source = PostgresHook(Variable.get("source_connection")).get_sqlalchemy_engine()
+    engine_target = PostgresHook(Variable.get("target_connection")).get_sqlalchemy_engine()
 
 
     start = EmptyOperator(task_id="start")
@@ -21,9 +22,9 @@ def dag():
     tasks = []
     import json
     for key, value in json.loads(Variable.get('method1_etl_configs')).items():
-        tasks.append(etl_task_group(key, value, engine))
+        tasks.append(etl_task_group(key, value, engine_source, engine_target))
 
-    healt = healt_check(engine)
+    healt = healt_check()
 
     start >> tasks >> healt >> EmptyOperator(task_id="end")
 

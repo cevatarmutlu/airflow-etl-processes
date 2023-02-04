@@ -19,24 +19,25 @@ from method_2.truncate import truncate_tasks
 )
 def dag():
 
-    engine = PostgresHook(Variable.get("source_connection")).get_sqlalchemy_engine()
+    engine_source = PostgresHook(Variable.get("source_connection")).get_sqlalchemy_engine()
+    engine_target = PostgresHook(Variable.get("target_connection")).get_sqlalchemy_engine()
     
 
     start_task = start()
 
-    extract_tasks_dict = get_extract_tasks_as_dict(engine)
+    extract_tasks_dict = get_extract_tasks_as_dict(engine_source)
 
     tasks = []
     for key, value in json.loads(Variable.get("method2_transform_mapping")).items():
         print(key, value.split(","))
         transformed_data = transforms_tasks[key.strip()](*[extract_tasks_dict[i.strip().replace(".", "_")] for i in value.split(",")])
-        truncate_task = truncate_tasks[key.strip()](engine, key.strip(), transformed_data)
-        load_task_result = load_tasks[key.strip()](truncate_task, engine, key.strip())
+        truncate_task = truncate_tasks[key.strip()](engine_target, key.strip(), transformed_data)
+        load_task_result = load_tasks[key.strip()](truncate_task, engine_target, key.strip())
         
         tasks.append(load_task_result)
 
     
-    healt = healt_check(engine)
+    healt = healt_check()
 
     start_task >> list(extract_tasks_dict.values())
     tasks >> healt >> EmptyOperator(task_id="end")

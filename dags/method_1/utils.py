@@ -37,18 +37,9 @@ def load(data, engine, write_schema, write_table):
     print("Insert operation is successfull")
 
 @task
-def healt_check(engine):
+def healt_check():
     import logging
     import subprocess
-
-    for table in ["public.sales_tx_t", "public.sales_t", "public.store_t", "data_marts.accounting_unit_data_mart", "data_marts.marketing_unit_data_mart"]:
-
-        data = pd.read_sql(
-            sql=f"SELECT * FROM {table}",
-            con=engine
-        )
-
-        logging.info(f"{table} rows: {len(data.index)}")
     
     process = subprocess.Popen(["df", "-H"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
@@ -57,11 +48,11 @@ def healt_check(engine):
     logging.info("\n" + out.decode("utf-8"))
 
 
-def etl_task_group(key, value, engine):
+def etl_task_group(key, value, engine_source, engine_target):
     with TaskGroup(key) as tg:
-        truncate_or_create_task = truncate_or_create(engine, value.get("write_schema"), value.get("write_table"), value.get("columns"))
-        data = extract_transform(engine, value.get("query"))
-        load_task = load(data, engine, value.get("write_schema"), value.get("write_table"))
+        truncate_or_create_task = truncate_or_create(engine_target, value.get("write_schema"), value.get("write_table"), value.get("columns"))
+        data = extract_transform(engine_source, value.get("query"))
+        load_task = load(data, engine_target, value.get("write_schema"), value.get("write_table"))
 
         truncate_or_create_task >> data >> load_task
     

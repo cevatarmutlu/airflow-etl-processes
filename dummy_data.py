@@ -74,7 +74,7 @@ if __name__ == '__main__':
     port = "8000"
 
     engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}')
-    schema = "tables"
+    schema = "public"
 
     sales_t = create_sales_t_as_pandas_dataframe(
         row_number=sales_count,

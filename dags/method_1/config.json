@@ -13,6 +13,6 @@
             "columns": "store_name VARCHAR(250) NOT NULL, store_status BOOL NOT null, sales_date TIMESTAMP NOT null, sales_price NUMERIC(10, 2) NOT NULL"
         }
     },
-    "source_connection": "iyzico_source",
-    "target_connection": "iyzico_target"
+    "source_connection": "source_connection",
+    "target_connection": "target_connection"
 }

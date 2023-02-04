@@ -6,9 +6,9 @@ from method_1.utils import *
 from airflow.providers.postgres.hooks.postgres import PostgresHook 
 
 @dag(
-    dag_id="Iyzico_etl_method1",
+    dag_id="etl_method1",
     schedule="*/20 * * * *", 
-    tags=["Iyzico", "etl", "method1"],
+    tags=["etl", "method1"],
     start_date=datetime(2023, 2, 2)
 )
 def dag():

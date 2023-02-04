@@ -6,7 +6,9 @@ Airflow kullanılarak iki farklı `etl` süreci içeren bir repodur. Bu `etl` s�
 
 * İkinci yöntemde `transaction` işlemlerinin gerçekleştirildiği bir veri tabanına `transform` gibi maliyetli bir aşamayı yaptırmak `source database`'in başka isteklere cevap vermesini yavaşlatacağı için `source database`'e sadece `extract` işlemleri yaptırılmıştır. `transform` ve `load` işlemleri `source database`'den ayrı olarak yapılmıştır.
 
-> Bütün ETL sürecindeki işlemler `pandas` kullanılarak yapılmıştır.
+> Bütün ETL sürecindeki işlemler `pandas` kullanılarak yapılmıştır. Bu sebeple `pandas`'ın üzerinde işlem yapamadığı hiçbir şey bu programda gerçekleştirilemez. `pandas`'ın üzerinde işlem yapamadığı bir veritabanından veri extract edilemez ya da veri yazılamaz.
+
+> Dinamik yapı Airflow `Variables` üzerinden gerçekleştirilmektedir. `source database`, `target database`, `extract` edilecek tablolar ve `load` işleminin gerçekleştirileceği tablolar, hangi tabloların `transform` işlemine tabi tutulacağı bilgileri `Variables` değerlerini barındıran `json` dosyalarında bulunmaktadır ve bu dosyaları `airflow`'e entegre edilir.
 
 ### Method 1
 
@@ -65,11 +67,13 @@ Açılan ekranda size `kullanıcı adı` ve `şifre` sorulacak. Kullanıcı adı
 
 ## Nasıl çalıştırılır?
 
-Programın nasıl çalıştırılacağı ve sizin sisteminize nasıl uygulanacağını gösteren kısım.
+Bu programda `task`'lar dinamik bir şekilde oluşturulmaktadır. Bu dinamiklik `airflow`'un `Variables` özelliği ile mümkün olmaktadır. Bağlantılara ait `connection id` değerleri, `extract` edilecek tabloların isimleri, `load` işlemi yapılacak edilecek tabloların isimleri `Variables` olarak airflow'a eklenir ve dinamiklik bu sayede gerçekleştirilir.
 
-### Connections
+### Connection'ların eklenmesi
 
-Bu program `source database` ve `target database` diye adlandırılan iki adet `PostgreSQL` veritabanı üzerinde işlem yapmaktadır. Bu veri tabanlarına bağlanmak için Airflow'un Connection kısmına database'lerin eklenmesi gerekmektedir.
+Bu program `source database` ve `target database` diye adlandırılan iki adet `PostgreSQL` veritabanı üzerinde işlem yapmaktadır. Bu veri tabanlarına bağlanmak için Airflow'un `Connections` kısmına database'lerin eklenmesi gerekmektedir.
+
+> extract, transform ve load işlemlerinin hepsi pandas üzerinden gerçekleştirildiği için pandas'ın üzerinde işlem yapamadığı hiçbir şey bu programda gerçekleştirilemez.
 
 Airflow'un `Admins` sekmesinde bulunan `Connections` sayfasını açtıktan sonra `+` işaretine basarak yeni bir connection ekleyelim.
 
@@ -91,7 +95,7 @@ Aşağıdaki gibi bir ekran gelmesi gerekmektedir. Bu ekranda gerekli yerleri do
 
 * Port: Veritabanı bağlantısı port'u. 8000 olarak giriniz.
 
-En alt kısımdaki test butonundan bağlantının başarılı bir şekilde gerçekleştirip gerçekleştirilmediğini görebilirsiniz. Test başarılı ile (ki sonucunu en üste çıkarak görebilirsiniz) Save butonuna basınız.
+En alt kısımdaki test butonundan bağlantının başarılı bir şekilde gerçekleştirip gerçekleştirilmediğini görebilirsiniz. Test başarılı ise (sonucunu en üste çıkarak görebilirsiniz) Save butonuna basınız.
 
 
 Benzer şekilde target database'ini ekleyiniz. Target database için bilgiler:
@@ -107,3 +111,54 @@ Benzer şekilde target database'ini ekleyiniz. Target database için bilgiler:
 
 ## Method1
 
+Birinci metot veritabanından query'ler ile `transform` edilmiş hazır veriyi alır ve `load` işleminin gerçekleştirileceği database'e veriyi yazar.
+
+Bu metot'u çalıştırmak için `dags/method_1/configs.json` dosyasının airflow'a `import` edilmesi gerekmektedir.
+
+`import` işlemi için `admins`'ın altında bulunan `variables` sayfasını açınız. Daha sonra sol taraftaki `Choose File` butonuna tıklayarak `dags/method_1/configs.json` dosyasını seçiniz ve `Import Variables` butonuna basınız. Bu işlemlerden sonra `DAGs` sayfasında `etl_method1` isimli bir DAG görmelisiniz.
+
+> Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
+
+### config.json
+
+Daha önce dinamik yapısın `Variables` ile sağlandığını ve `Variables` değerlerin ise `config.json` dosyasından geldiğini belirtmiştik. Şimdi JSON dosyasındaki yapının anlamını açıklayalım.
+
+Method1 için JSON dosyasında 3 temel key değeri bulunmaktadır.
+
+* method1_etl_configs: Method1 için gerekli olan belirli parametreleri barındırır. Load işleminin yapılacağı şemanın ve tablonun adı, `source database`'e çalışacak query ve load tablonun oluşturulması için load tablonun kolonları ve tip değerleri.
+
+* source_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde source database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
+
+* target_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde target database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
+
+```json
+{
+    "method1_etl_configs" : {},
+    "source_connection": "source_connection",
+    "target_connection": "target_connection"
+}
+```
+* source_connection: 
+* target_connection:
+
+
+Aşağıda bir tane `method1_etl_configs` değerinin key ve value değerini görmektesiniz. Key değeri verinin yazılacak tablonun adını temsil etmektedir.
+
+* query: method1 kaynak veritabanından hazır bir veriyi alıp pandas ile target database'e veriyi basmaktadır. Bu parametre veriyi hazırlayan query'nin kendisidir. query'i parametresi sonucu oluşsan tablo target database'e yazılır.
+
+* write_schema: target database'deki verinin yazılacağı schema'nın adıdır.
+
+* write_table: target database'deki verinin yazılacağı table'ın adıdır.
+
+* columns: Eğer load edilecek tablo target database'e yoksa tabloyu oluşturmak için kolon isimlerini buraya yazıyoruz. Buraya create query'side yazılabilirdi niye böyle bir şey yaptım bilmiyorum :)
+
+```json
+"accounting_unit_data_mart": {
+            "query": "select st.paid_price, CAST(st.create_date as DATE) from sales_tx_t stt left join sales_t st on stt.sales_id = st.id where stt.status = true;",
+            "write_schema": "data_marts",
+            "write_table": "accounting_unit_data_mart",
+            "columns": "CREATE_DATE TIMESTAMP NOT null, PAID_PRICE NUMERIC(10, 2) NOT NULL"
+}
+```
+
+Method1 için yeni bir load işlemi eklemek için yapmanız gereken sadece `method1_etl_configs` kısmına yeni bir ekleme yapmaktır.

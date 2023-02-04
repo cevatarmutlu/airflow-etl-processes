@@ -61,6 +61,8 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+  networks:
+      - airflow-etl-processes-network
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -84,6 +86,8 @@ services:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
+    networks:
+      - airflow-etl-processes-network
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
@@ -99,6 +103,8 @@ services:
       POSTGRES_DB: source
     ports:
       - 8000:5432
+    networks:
+      - airflow-etl-processes-network
     volumes:
       - postgres-source-db-volume:/var/lib/postgresql/data
     healthcheck:
@@ -114,6 +120,8 @@ services:
       POSTGRES_DB: target
     ports:
       - 8001:5432
+    networks:
+      - airflow-etl-processes-network
     volumes:
       - postgres-target-db-volume:/var/lib/postgresql/data
     healthcheck:
@@ -125,6 +133,8 @@ services:
     image: redis:latest
     expose:
       - 6379
+    networks:
+      - airflow-etl-processes-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -134,6 +144,8 @@ services:
   airflow-webserver:
     <<: *airflow-common
     command: webserver
+    networks:
+      - airflow-etl-processes-network
     ports:
       - 9080:8080
     healthcheck:
@@ -149,6 +161,8 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    networks:
+      - airflow-etl-processes-network
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
       interval: 10s
@@ -169,6 +183,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    networks:
+      - airflow-etl-processes-network
     environment:
       <<: *airflow-common-env
       # Required to handle warm shutdown of the celery workers properly
@@ -182,6 +198,8 @@ services:
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
+    networks:
+      - airflow-etl-processes-network
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
       interval: 10s
@@ -195,6 +213,8 @@ services:
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
+    networks:
+      - airflow-etl-processes-network
     # yamllint disable rule:line-length
     command:
       - -c
@@ -274,6 +294,8 @@ services:
     <<: *airflow-common
     profiles:
       - debug
+    networks:
+      - airflow-etl-processes-network
     environment:
       <<: *airflow-common-env
       CONNECTION_CHECK_MAX_COUNT: "0"
@@ -293,6 +315,8 @@ services:
       - flower
     ports:
       - 5555:5555
+    networks:
+      - airflow-etl-processes-network
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
       interval: 10s
@@ -307,3 +331,7 @@ volumes:
   postgres-db-volume:
   postgres-source-db-volume:
   postgres-target-db-volume:
+
+networks:
+  airflow-etl-processes-network:
+    name: airflow-etl-processes-network

@@ -11,13 +11,9 @@ Bu repo `airflow` kullanılarak iki farklı `etl` süreci gerçekleştirebilir. 
 
 * [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
 * [Çalışma Sistemi](#çalışma-sistemi)
-    * [Modüller ve yaptığı işler](#modüller-ve-yaptığı-işler)
-* [İstenen Çıktılar](#i̇stenen-çıktılar)
-    * [Requirenment-1: category_management](#requirenment-1-category_management)
-    * [Requirenment-2: marketing_department](#requirenment-2-marketing_department)
-    * [Requirenment-3: api](#requirenment-3-api)
-* [Eksikler ve Hatalar](#eksikler-ve-hatalar)
-
+    * [Method 1](#method-1)
+    * [Method 2](#method-2)
+* [Kurulum](#kurulum)
 
 ## Kullanılan Teknolojiler
 
@@ -28,6 +24,7 @@ PostgreSQL  | target ve source database olarak
 Pandas      | extract, transform ve load süreçleri için
 SQLAlchemy  | Pandas'ın veritabanı işlemleri yapabilmesi için
 
+## Çalışma Sistemi
 
 ### Method 1
 
@@ -41,12 +38,6 @@ Bu yöntemde, transform işlemlerinin oluşturduğu yük veritabanına verilmiş
 * `truncate_or_create`: Load işleminin yapılacağı tablo `truncate` edilmektedir. Eğer bu tablo `target database`de yoksa tablo için `create` işlemi yapılmaktadır.
 * `extract_transform`: `transform` işlemi için gereken filtreleme, join gibi işlemleri barındıran bir `SQL Query`'si ile `source database`'den `transform` edilmiş veri elde edilir.
 * `load`: `extract_transform` task'ından elde edilen veriyi doğrudan `target database`'e load eden task.
-
-
-#### Method1'in eksikleri ya da bağımlılıkları
-
-1. Bu method `prod` ortamdaki bir database'den veri çekerken prod'daki database'in diğer client'lara cevap verme süresini önemli ölçüde yavaşlatabilir çünkü filtreleme ve join gibi işlemler database tarafından yapılmaktadır.
-2. Bu yöntemde `source database` dışında gelen bir datanın işleme tabi olması mümkün değildir.
 
 
 ## Method2

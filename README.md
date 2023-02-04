@@ -15,12 +15,13 @@ docker compose up airflow-init
 docker compose up -d
 ```
 
-> Docker üzerinden airflow kurulumu ve daha fazla bilgi [için](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html)
+> Docker kurulumu [için](https://docs.docker.com/engine/install/) <br/>
+Docker ile airflow kurulumu ve daha fazla bilgi [için](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html)
 
 
 Birkaç dakika bekledikten sonra [buradaki](http://localhost:9080/) linke tıklayarak `airflow` arayüzüne gidebilirsiniz. 
 
 > airflow `local`inizde `9080` portunda çalışmaktadır.
 
-Açılan ekranda size kullanıcı adı ve şifre sorulacak. Kullanıcı adı ve şifre `airflow`'dur.
+Açılan ekranda size `kullanıcı adı` ve `şifre` sorulacak. Kullanıcı adı ve şifre `airflow`'dur.
 

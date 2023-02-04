@@ -164,8 +164,6 @@ Method1 için JSON dosyasında 3 temel key değeri bulunmaktadır.
     "target_connection": "target_connection"
 }
 ```
-* source_connection: 
-* target_connection:
 
 
 Aşağıda bir tane `method1_etl_configs` değerinin key ve value değerini görmektesiniz. Key değeri verinin yazılacak tablonun adını temsil etmektedir.
@@ -187,4 +185,48 @@ Aşağıda bir tane `method1_etl_configs` değerinin key ve value değerini gör
 }
 ```
 
+### Method1'e yeni bir ekleme yapmak
+
 Method1 için yeni bir load işlemi eklemek için yapmanız gereken sadece `method1_etl_configs` kısmına yeni bir ekleme yapmaktır.
+
+
+## Method2
+
+İkinci metot veritabanından verileri tablolar halinde çeker ve transform işlemini airflow'a bırakır.
+
+Bu metot'u çalıştırmak için dags/method_2/configs.json dosyasının airflow'a import edilmesi gerekmektedir.
+
+`import` işlemi için `admins`'ın altında bulunan `variables` sayfasını açınız. Daha sonra sol taraftaki `Choose File` butonuna tıklayarak `dags/method_1/configs.json` dosyasını seçiniz ve `Import Variables` butonuna basınız. Bu işlemlerden sonra `DAGs` sayfasında `etl_method1` isimli bir DAG görmelisiniz.
+
+> Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
+
+### config.json
+
+Daha önce dinamik yapısın `Variables` ile sağlandığını ve `Variables` değerlerin ise `config.json` dosyasından geldiğini belirtmiştik. Şimdi JSON dosyasındaki yapının anlamını açıklayalım.
+
+```json
+{
+    "source_connection": "",
+    "target_connection": "",
+    "method2_extract_tables": "", 
+    "method2_transformed_table_names":  "",
+    "method2_transform_mapping": {}
+}
+```
+
+* source_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde source database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
+
+* target_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde target database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
+
+* method2_extract_tables: extract edilecek tabloların isimleridir. Tabloların yazılma şekli: "{{schema}}.{{table}}, {{schema}}.{{table}}, ...." Örneğin: "public.sales_tx_t, public.sales_t"
+
+* method2_transformed_table_names: Load edilecek tabloların isimlerdir. Tabloların yazılma şekli: "{{schema}}.{{table}}, {{schema}}.{{table}}, ...." Örneğin: "data_marts.accounting_unit_data_mart, data_marts.marketing_unit_data_mart"
+
+* method2_transform_mapping: transform işleminde kullanılacak verilerin kullanıcılağı extract edilmiş tablolar. key'in yazılma şekli {{schema}}{{table}}. Value'nin ise "{{schema}}.{{table}}, {{schema}}.{{table}}, ...."
+
+
+### Method2'e yeni bir ekleme yapmak
+
+* Eğer yeni tablo kullanılacaksa `method2_extract_tables` kısmına yeni tabloyu ekleyin.
+* Yeni load edilecek tablonun adını `method2_transformed_table_names`'e ekleyin.
+* load edilecek yeni tablonun oluşturulması için gereken tablolar buraya eklenir.

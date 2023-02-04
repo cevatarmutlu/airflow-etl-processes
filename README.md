@@ -1,14 +1,33 @@
 ## airflow-etl-processes
 
-Airflow kullanılarak iki farklı `etl` süreci içeren bir repodur. Bu `etl` süreçleri olabildiğince dinamik bir yapıda yapılmıştır.
+Bu repo `airflow` kullanılarak iki farklı `etl` süreci gerçekleştirebilir. `etl` süreçleri belirli sınırlara sahiptir; örneğin `pandas`. Bu `etl` süreçleri belirli sınırlara sahip olmasına karşın, bu sınırlar içinde, airflow `task`larının oluşturulmasında dinamik bir yapı sunar.  
 
-* Birinci yöntemde `extract` ve `transform` işlemlerindeki yük verinin çekildiği `source database`'e bırakılmıştır. Database'den dönüştürülmüş şekilde elde edilen veriler `target database`'e yüklenmiştir.
+* Birinci `etl` sürecinde, `transform` işlemindeki yük verinin çekildiği `source database`'e bırakılmıştır. `source database`'den elde edilen `transform` edilmiş veriler `target database`'e yüklenmektedir.
 
-* İkinci yöntemde `transaction` işlemlerinin gerçekleştirildiği bir veri tabanına `transform` gibi maliyetli bir aşamayı yaptırmak `source database`'in başka isteklere cevap vermesini yavaşlatacağı için `source database`'e sadece `extract` işlemleri yaptırılmıştır. `transform` ve `load` işlemleri `source database`'den ayrı olarak yapılmıştır.
+* İkinci `etl` sürecinde ise `etl` sürecindeki bütün işlemler birbirlerinden bağımsız bir şekilde gerçekleştirilir.
 
-> Bütün ETL sürecindeki işlemler `pandas` kullanılarak yapılmıştır. Bu sebeple `pandas`'ın üzerinde işlem yapamadığı hiçbir şey bu programda gerçekleştirilemez. `pandas`'ın üzerinde işlem yapamadığı bir veritabanından veri extract edilemez ya da veri yazılamaz.
 
-> Dinamik yapı Airflow `Variables` üzerinden gerçekleştirilmektedir. `source database`, `target database`, `extract` edilecek tablolar ve `load` işleminin gerçekleştirileceği tablolar, hangi tabloların `transform` işlemine tabi tutulacağı bilgileri `Variables` değerlerini barındıran `json` dosyalarında bulunmaktadır ve bu dosyaları `airflow`'e entegre edilir.
+## İçindekiler
+
+* [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
+* [Çalışma Sistemi](#çalışma-sistemi)
+    * [Modüller ve yaptığı işler](#modüller-ve-yaptığı-işler)
+* [İstenen Çıktılar](#i̇stenen-çıktılar)
+    * [Requirenment-1: category_management](#requirenment-1-category_management)
+    * [Requirenment-2: marketing_department](#requirenment-2-marketing_department)
+    * [Requirenment-3: api](#requirenment-3-api)
+* [Eksikler ve Hatalar](#eksikler-ve-hatalar)
+
+
+## Kullanılan Teknolojiler
+
+Teknoloji   | Kullanımı
+---------   | ---------
+Docker      | airflow, source ve target database ortam sağlayıcısı
+PostgreSQL  | target ve source database olarak
+Pandas      | extract, transform ve load süreçleri için
+SQLAlchemy  | Pandas'ın veritabanı işlemleri yapabilmesi için
+
 
 ### Method 1
 

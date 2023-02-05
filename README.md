@@ -21,6 +21,9 @@ Bu repo `airflow` kullanılarak iki farklı `etl` süreci gerçekleştirebilir. 
     * [Dummy verinin oluşturulması](#dummy-verinin-oluşturulması)
     * [Method1](#method1)
     * [Method2](#method2)
+* [Nasıl ekleme yapılır?](#nasıl-ekleme-yapılır)
+    * [Method1](#method1)
+    * [Method2](#method2)
 
 
 ## Kullanılan Teknolojiler
@@ -190,7 +193,7 @@ Bu method'u çalıştırmak için `dags/method_2/configs.json` dosyasının airf
 
 > Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
 
-## Dag'lere yeni bir sürecin eklenmesi ve config dosyalarının açıklaması
+## Nasıl ekleme yapılır?
 
 Dinamik yapı `config.json` dosyalarına girilen değerlerle sağlanmaktadır. Bu değerlerin açıklaması ve dinamik yapının nasıl kullanılacağı bu kısımda anlatılmıştır.
 

@@ -88,29 +88,29 @@ Bu program `source database` ve `target database` diye adlandırılan iki adet `
 
 Airflow'un `Admins` sekmesinde bulunan `Connections` sayfasını açtıktan sonra `+` işaretine basarak yeni bir connection ekleyelim.
 
-Aşağıdaki gibi bir ekran gelmesi gerekmektedir. Bu ekranda gerekli yerleri doldurmalısınız.
+Açılan sayfada aşağıdaki gibi bir ekran gelmesi gerekmektedir. Bu ekranda gerekli yerleri doldurmalısınız.
 
 ![add_connection](images/add_connection.png)
 
 * Connection Id: Bu değer connection için verdiğiniz bir isimdir. İstediğiniz ismi verebilirsiniz. Bağlantıya vereceğiniz isim `source database`'e bağlanırken kullanılacaktır. Bu örnek için `source_connection`
 
-* Connection Type: Bir sürü bağlantı tipi bulunmaktadır. Biz PostgreSQL üzerinde işlem yapacağımız için Postgres'i seçin.
+* Connection Type: Bir sürü bağlantı tipi bulunmaktadır. Biz PostgreSQL üzerinde işlem yapacağımız için `Postgres`'i seçin.
 
 * Host: Database'in host'udur. Host'u öğrenmek için <br/> `docker inspect airflow-etl-processes-network -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}'` <br/> komutunu çalıştırınız. Çıkan değeri host kısmına yazınır.
 
-* Schema: Schema olarak yazmaktadır lakin buradaki isim database olmaktadır. PostgreSQL içindeki üzerinde işlem yapacağımız database olmaktadır. BU örnek için `source` olarak yazınız.
+* Schema: Schema olarak yazmaktadır lakin buradaki isim database olmaktadır. PostgreSQL'de üzerinde işlem yapacağımız database'in adıdır. Bu örnek için `source` olarak yazınız.
 
 * Login: Veritabanı bağlantısını sağlayacak olan username olmaktadır. `source` yazınız.
 
-* Password: Veritabanı user'ının şifresinidir. `source` yazınız.
+* Password: Veritabanı user'ının şifresidir. `source` yazınız.
 
-* Port: Veritabanı bağlantısı port'u. 8000 olarak giriniz.
+* Port: Veritabanı bağlantısı port'u. `source database`'e bağlanmak için `8000` olarak giriniz.
 
-En alt kısımdaki `test` butonundan bağlantının başarılı bir şekilde gerçekleştirip gerçekleştirilmediğini görebilirsiniz. Test başarılı ise (sonucunu en üste çıkarak görebilirsiniz) `Save` butonuna basınız.
+Gerekli yerleri doldurduktan sonra en alt kısımdaki `test` butonundan bağlantının başarılı bir şekilde gerçekleştirip gerçekleştirilmediğini görebilirsiniz. Test başarılı ise (sonucunu en üste çıkarak görebilirsiniz) `Save` butonuna basınız.
 
 #### Target Database'in eklenmesi
 
-Source database'in eklenmesi gibi target database'ini ekleyiniz. Target database için bilgiler:
+Source database'in eklenmesi gibi `target database`'ini ekleyiniz. `target database` için bilgiler:
 
 * Connection Id : `target_connection`
 * Connection Type: Postgres
@@ -122,13 +122,10 @@ Source database'in eklenmesi gibi target database'ini ekleyiniz. Target database
 
 ### Dummy verinin oluşturulması
 
-Dummy veri oluşturmak için `dummy_data.py` script'ini çalıştırmanız yeterlidir. Script içindeki parametrelere dokunmasanıza gerek yoktur.
+Programın işlem yapabilmesi için bir veri olması gerekmektedir. `dummy_data.py` script'i örnek veri oluşturup `source database`'e yazmaktadır.
 
-```
-python3 dummy_data.py
-```
-
-#### dummy_data.py parametreleri
+<details>
+<summary>dummy_data.py parametreleri</summary>
 
 ```python
 customer_count = 2500 # custormer_t tablosundaki satır sayısı. Müşteri sayısı.
@@ -145,7 +142,15 @@ db_params = {
 
 schema = "public" # veri yazılacak database'in şemasının adı
 ```
+</details> <br/>
 
+> Eğer farklı bir `source connection` kullanmıyorsanız script içindeki parametrelere dokunmanıza gerek yoktur.
+
+Aşağıdaki komutu çalıştırarak `source database`'e dummy data ekletmiş olursunuz:
+
+```
+python3 dummy_data.py
+```
 
 ## Method1 nasıl çalışır hale getirilir?
 

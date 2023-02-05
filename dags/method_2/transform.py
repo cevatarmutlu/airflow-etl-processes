@@ -42,7 +42,7 @@ def transform_marketing_unit_data_mart(sales_tx_t, sales_t, store_t):
 def transform_customer_unit_data_mart(customer_t):
     return customer_t
 
-transforms_tasks = {
+transform_tasks_dict = {
     "data_marts.accounting_unit_data_mart": transform_accounting_unit_data_mart,
     "data_marts.marketing_unit_data_mart": transform_marketing_unit_data_mart,
     "data_marts.customer_unit_data_mart": transform_customer_unit_data_mart

@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 from airflow.models import Variable
 
-truncate_tasks = {}
+truncate_tasks_dict = {}
 
 for table_name in Variable.get("method2_transformed_table_names").split(","):
     @task(task_id=f"truncate_{table_name.strip().replace('.', '_')}")
@@ -18,6 +18,6 @@ for table_name in Variable.get("method2_transformed_table_names").split(","):
 
         return data
 
-    truncate_tasks[table_name.strip()] = truncate
+    truncate_tasks_dict[table_name.strip()] = truncate
 
         

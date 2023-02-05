@@ -5,11 +5,11 @@ from airflow.models import Variable
 import json
 from datetime import datetime
 
-from method_2.extract import get_extract_tasks_as_dict
-from method_2.transform import *
-from method_2.load import load_tasks
+from method_2.extract import get_extract_tasks_results_as_dict
+from method_2.transform import transform_tasks_dict
+from method_2.load import load_tasks_dict
 from method_2.utils import *
-from method_2.truncate import truncate_tasks
+from method_2.truncate import truncate_tasks_dict
 
 @dag(
     dag_id="etl_method2",
@@ -25,26 +25,28 @@ def dag():
 
     start_task = start()
 
-    extract_tasks_dict = get_extract_tasks_as_dict(engine_source)
+    extract_tasks_result_dict = get_extract_tasks_results_as_dict(engine_source)
 
     tasks = []
-    for key, value in json.loads(Variable.get("method2_transform_mapping")).items():
+    for load_table, load_table_req_source_tables in json.loads(Variable.get("method2_transform_mapping")).items():
 
-        transform_task = transforms_tasks[key.strip()]
+        transform_task = transform_tasks_dict[load_table.strip()]
         transformed_data = transform_task(
-            *[extract_tasks_dict[i.strip().replace(".", "_")] for i in value.split(",")]
+            *[extract_tasks_result_dict[i.strip().replace(".", "_")] for i in load_table_req_source_tables.split(",")]
         )
-        truncate_task = truncate_tasks[key.strip()](engine_target, key.strip(), transformed_data)
-        load_task_result = load_tasks[key.strip()](truncate_task, engine_target, key.strip())
+
+        truncate_task = truncate_tasks_dict[load_table.strip()]
+        truncate_task_result = truncate_task(engine_target, load_table.strip(), transformed_data)
+
+        load_task = load_tasks_dict[load_table.strip()]
+        load_task_result = load_task(truncate_task_result, engine_target, load_table.strip())
         
         tasks.append(load_task_result)
 
     
     healt = healt_check()
 
-    start_task >> list(extract_tasks_dict.values())
+    start_task >> list(extract_tasks_result_dict.values())
     tasks >> healt >> EmptyOperator(task_id="end")
 
 dag()
-
-

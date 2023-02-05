@@ -4,7 +4,7 @@ import logging
 from airflow.models import Variable
 
 
-def get_extract_tasks_as_dict(engine):
+def get_extract_tasks_results_as_dict(engine):
     
     extract_tasks = {}
 

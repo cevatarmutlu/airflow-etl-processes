@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 from airflow.models import Variable
 
-load_tasks = {}
+load_tasks_dict = {}
 
 for table_name in Variable.get("method2_transformed_table_names").split(","):
     @task(task_id=f"load_{table_name.strip().replace('.', '_')}")
@@ -17,4 +17,4 @@ for table_name in Variable.get("method2_transformed_table_names").split(","):
 
         logging.info("Load operation is successfull: marketing_unit_data_mart")
 
-    load_tasks[table_name.strip()] = load
+    load_tasks_dict[table_name.strip()] = load

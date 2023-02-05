@@ -182,3 +182,57 @@ Bu method'u çalıştırmak için `dags/method_2/configs.json` dosyasının airf
 
 > Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
 
+## Dag'lere yeni bir sürecin eklenmesi ve config dosyalarının açıklaması
+
+Dinamik yapı `config.json` dosyalarına girilen değerlerle sağlanmaktadır. Bu değerlerin açıklaması ve dinamik yapının nasıl kullanılacağı bu kısımda anlatılmıştır.
+
+### Method1
+
+Method1 için JSON dosyasında 3 temel key değeri bulunmaktadır.
+
+```json
+{
+    "method1_etl_configs" : {},
+    "source_connection": "source_connection",
+    "target_connection": "target_connection"
+}
+```
+
+* `method1_etl_configs`: Method1 için gerekli olan belirli parametreleri barındırır. Load işleminin yapılacağı şemanın ve tablonun adı, `source database`'e çalışacak query ve load tablonun oluşturulması için load tablonun kolonları ve tip değerleri.
+
+* `source_connection`: `Connections` kısmında bulunan `Connection Id` değeri burada bulunur. Bu variable sayesinde `source database`'i değiştirmek için yapmanız gerek şey sadece `connection id` değerini değiştirmektedir.
+
+* `target_connection`: `Connections` kısmında bulunan `Connection Id` değeri burada bulunur. Bu variable sayesinde `target database`'i değiştirmek için yapmanız gerek şey sadece `connection id` değerini değiştirmektedir.
+
+
+`method1_etl_configs` değerinin ne işe yaradığı aşağıdaki kısımda anlatılmıştır.
+
+```json
+{
+    "accounting_unit_data_mart": {
+                "query": "select st.paid_price, CAST(st.create_date as DATE) from sales_tx_t stt left join sales_t st on stt.sales_id = st.id where stt.status = true;",
+                "write_schema": "data_marts",
+                "write_table": "accounting_unit_data_mart",
+                "columns": "CREATE_DATE TIMESTAMP NOT null, PAID_PRICE NUMERIC(10, 2) NOT NULL"
+    }
+}
+```
+
+* `accounting_unit_data_mart`: Method1'deki taskGroup ismi olarak kullanılır isimdir.
+
+* `query`: `source database`'den `transform` edilmiş veriyi sağlayacak olan sorgudur.
+
+* `write_schema`: `target database`'deki verinin yazılacağı schema'nın adıdır.
+
+* `write_table`: target database'deki verinin yazılacağı table'ın adıdır.
+
+* `columns`: Eğer load edilecek tablo `target database`'de yoksa tablonun oluşturulması için gerekli olan kolon parametreleri. 
+
+
+#### Method1'e yeni bir sürecin eklenmesi
+
+Method1 için yeni bir sürecin eklenmesi için yapmanız gereken sadece `config.json` dosyasındaki değerleri değiştirmektedir. 
+
+* `source_connection` ve `target_connection` değerlerini değiştirerek işlemlerin başka veritabanları üzerinde gerçekleştirilmesini sağlayabilirsiniz.
+
+`method1_etl_configs` kısmına yeni bir ekleme yaparak yeni tablonun nasıl okunacağını ve nereye yazılacağını, adının ne olacağını bildirebilirsiniz.

@@ -240,14 +240,14 @@ Method1 için yeni bir sürecin eklenmesi için yapmanız gereken sadece `config
 
 ### Method2
 
-Method1 için JSON dosyasında 5 temel key değeri bulunmaktadır.
+Method2 için JSON dosyasında 5 temel key değeri bulunmaktadır.
 
 ```json
 {
-    "source_connection": "",
-    "target_connection": "",
-    "method2_extract_tables": "", 
-    "method2_transformed_table_names":  "",
+    "source_connection": "source_connection",
+    "target_connection": "target_connection",
+    "method2_extract_tables": "public.sales_tx_t, public.sales_t, public.store_t, public.customer_t", 
+    "method2_transformed_table_names":  "data_marts.accounting_unit_data_mart, data_marts.marketing_unit_data_mart, data_marts.customer_unit_data_mart",
     "method2_transform_mapping": {}
 }
 ```

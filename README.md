@@ -46,19 +46,19 @@ Bu yöntemde `source database` sadece kullanılacak olan tabloları airflow'a ak
 
 ![alt text](/images/method2_tasks.png)
 
-> extract, truncate ve load isimleriyle başlayan bütün tasklar dinamik olarak oluşturulmaktadır.
+> extract, truncate ve load isimleriyle başlayan bütün tasklar dinamik olarak oluşturulmaktadır. tranform taskları ise elle girilmelidir.
 
-1. `source database`'den `etl` süreci için gerekli olan bütün tablolar çekilir: `extract_*`
-2. Çekilen veriler gerekli olan `transform task`'ına iletilir ve gerekli bütün işlemler gerçekleştirilir: `transform_*`
-3. `transform` işleminden sonra oluşturulan verinin `load` edileceği tablo `truncate` edilir: `truncate_*`
-4. `truncate` işleminden sonra load işlemi gerçekleştirilir: `load_*`
+1. `extract_*`: `source database`'den `etl` süreci için gerekli olan bütün tablolar çekilir.
+2. `transform_*`: `extract` tasklarından çekilen veriler gerekli olan `transform` task'ına iletilir ve gerekli bütün işlemler gerçekleştirilir.
+3. `truncate_*`: `transform` işleminden sonra oluşturulan verinin `load` edileceği tablo `truncate` edilir.
+4. `load_*`: `truncate` işleminden sonra load işlemi gerçekleştirilir.
 
 ## Kurulum
 
 Kurulum için sadece `Docker` gerekmektedir. `Docker` kurulu ise:
 
 ```bash
-docker compose up airflow-init
+docker compose up airflow-init # Komut çalışmasını bitirdikten sonra aşağıdaki komuta geçiniz.
 docker compose up -d
 ```
 
@@ -75,15 +75,16 @@ Açılan ekranda size `kullanıcı adı` ve `şifre` sorulacak. Kullanıcı adı
 > İlk açılırken hata alıcaksınızdır. `Nasıl Çalıştırılır?` kısmını okumaya devam ederek hataları gidereceksiniz.
 
 
-## Nasıl çalıştırılır?
+## Nasıl çalışır hale getirilir?
 
-Bu programda `task`'lar dinamik bir şekilde oluşturulmaktadır. Bu dinamiklik `airflow`'un `Variables` özelliği ile mümkün olmaktadır. Bağlantılara ait `connection id` değerleri, `extract` edilecek tabloların isimleri, `load` işlemi yapılacak edilecek tabloların isimleri `Variables` olarak airflow'a eklenir ve dinamiklik bu sayede gerçekleştirilir.
+Kurulum aşamasında alınan hataların nasıl giderileceği ve programın nasıl çalışır duruma getirileceği bu kısımda anlatılmıştır.
+
 
 ### Connection'ların eklenmesi
 
-Bu program `source database` ve `target database` diye adlandırılan iki adet `PostgreSQL` veritabanı üzerinde işlem yapmaktadır. Bu veri tabanlarına bağlanmak için Airflow'un `Connections` kısmına database'lerin eklenmesi gerekmektedir.
+Bu program `source database` ve `target database` diye adlandırılan iki adet `PostgreSQL` veritabanı üzerinde işlem yapmaktadır. Bu veri tabanlarına bağlanmak için Airflow'un `Connections` kısmına database bağlantılarının eklenmesi gerekmektedir.
 
-> extract, transform ve load işlemlerinin hepsi pandas üzerinden gerçekleştirildiği için pandas'ın üzerinde işlem yapamadığı hiçbir şey bu programda gerçekleştirilemez.
+#### Source Database'in eklenmesi
 
 Airflow'un `Admins` sekmesinde bulunan `Connections` sayfasını açtıktan sonra `+` işaretine basarak yeni bir connection ekleyelim.
 
@@ -105,10 +106,11 @@ Aşağıdaki gibi bir ekran gelmesi gerekmektedir. Bu ekranda gerekli yerleri do
 
 * Port: Veritabanı bağlantısı port'u. 8000 olarak giriniz.
 
-En alt kısımdaki test butonundan bağlantının başarılı bir şekilde gerçekleştirip gerçekleştirilmediğini görebilirsiniz. Test başarılı ise (sonucunu en üste çıkarak görebilirsiniz) Save butonuna basınız.
+En alt kısımdaki `test` butonundan bağlantının başarılı bir şekilde gerçekleştirip gerçekleştirilmediğini görebilirsiniz. Test başarılı ise (sonucunu en üste çıkarak görebilirsiniz) `Save` butonuna basınız.
 
+#### Target Database'in eklenmesi
 
-Benzer şekilde target database'ini ekleyiniz. Target database için bilgiler:
+Source database'in eklenmesi gibi target database'ini ekleyiniz. Target database için bilgiler:
 
 * Connection Id : `target_connection`
 * Connection Type: Postgres
@@ -118,15 +120,15 @@ Benzer şekilde target database'ini ekleyiniz. Target database için bilgiler:
 * Password: target
 * Port: 8001
 
-## Dummy verinin oluşturulması
+### Dummy verinin oluşturulması
 
-Dummy veri oluşturmak için `dummy_data.py` script'ini çalıştırmanız yeterlidir. Aşağıdaki parametrelere dokunmasanıza gerek yoktur.
+Dummy veri oluşturmak için `dummy_data.py` script'ini çalıştırmanız yeterlidir. Script içindeki parametrelere dokunmasanıza gerek yoktur.
 
 ```
 python3 dummy_data.py
 ```
 
-### dummy_data.py parametreleri
+#### dummy_data.py parametreleri
 
 ```python
 customer_count = 2500 # custormer_t tablosundaki satır sayısı. Müşteri sayısı.
@@ -145,7 +147,7 @@ schema = "public" # veri yazılacak database'in şemasının adı
 ```
 
 
-## Method1
+## Method1 nasıl çalışır hale getirilir?
 
 Birinci metot veritabanından query'ler ile `transform` edilmiş hazır veriyi alır ve `load` işleminin gerçekleştirileceği database'e veriyi yazar.
 

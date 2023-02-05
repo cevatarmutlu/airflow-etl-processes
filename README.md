@@ -14,6 +14,13 @@ Bu repo `airflow` kullanılarak iki farklı `etl` süreci gerçekleştirebilir. 
     * [Method 1](#method-1)
     * [Method 2](#method-2)
 * [Kurulum](#kurulum)
+* [Nasıl çalışır hale getirilir?](#nasıl-çalışır-hale-getirilir)
+    * [Connection'ların eklenmesi](#connectionların-eklenmesi)
+        * [Source Database'in eklenmesi](#source-databasein-eklenmesi)
+        * [Target Database'in eklenmesi](#target-databasein-eklenmesi)
+    * [Dummy verinin oluşturulması](#dummy-verinin-oluşturulması)
+    * [Method1'in çalıştırılması]()
+
 
 ## Kullanılan Teknolojiler
 
@@ -154,7 +161,7 @@ schema = "public" # veri yazılacak database'in şemasının adı
 python3 dummy_data.py
 ```
 
-## Method1 nasıl çalışır hale getirilir?
+## Method1
 
 Birinci metot, query'ler ile `transform` edilmiş hazır veriyi alır ve `load` işleminin gerçekleştirileceği database'e veriyi yazar.
 

@@ -22,8 +22,8 @@ Bu repo `airflow` kullanılarak iki farklı `etl` süreci gerçekleştirebilir. 
     * [Method1](#method1)
     * [Method2](#method2)
 * [Nasıl ekleme yapılır?](#nasıl-ekleme-yapılır)
-    * [Method1](#method1)
-    * [Method2](#method2)
+    * [Method1](#method1-1)
+    * [Method2](#method2-1)
 
 
 ## Kullanılan Teknolojiler

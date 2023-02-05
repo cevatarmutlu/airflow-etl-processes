@@ -235,4 +235,50 @@ Method1 için yeni bir sürecin eklenmesi için yapmanız gereken sadece `config
 
 * `source_connection` ve `target_connection` değerlerini değiştirerek işlemlerin başka veritabanları üzerinde gerçekleştirilmesini sağlayabilirsiniz.
 
-`method1_etl_configs` kısmına yeni bir ekleme yaparak yeni tablonun nasıl okunacağını ve nereye yazılacağını, adının ne olacağını bildirebilirsiniz.
+* `method1_etl_configs` kısmına yeni bir ekleme yaparak yeni tablonun nasıl okunacağını ve nereye yazılacağını, adının ne olacağını bildirebilirsiniz.
+
+
+### Method2
+
+Method1 için JSON dosyasında 5 temel key değeri bulunmaktadır.
+
+```json
+{
+    "source_connection": "",
+    "target_connection": "",
+    "method2_extract_tables": "", 
+    "method2_transformed_table_names":  "",
+    "method2_transform_mapping": {}
+}
+```
+
+* `source_connection`: `Connections` kısmında bulunan `Connection Id` değeri burada bulunur. Bu variable sayesinde `source database`'i değiştirmek için yapmanız gerek şey sadece `connection id` değerini değiştirmektedir.
+
+* `target_connection`: `Connections` kısmında bulunan `Connection Id` değeri burada bulunur. Bu variable sayesinde `target database`'i değiştirmek için yapmanız gerek şey sadece `connection id` değerini değiştirmektedir.
+
+* `method2_extract_tables`: `extract` edilecek tabloların isimleridir. Tabloların yazılma şekli: `"{{schema}}.{{table}}, {{schema}}.{{table}}, ...."` şeklindedir. Örneğin: "public.sales_tx_t, public.sales_t"
+
+* `method2_transformed_table_names`: `load` edilecek tabloların isimlerdir. Tabloların yazılma şekli: `"{{schema}}.{{table}}, {{schema}}.{{table}}, ...."` şeklindedir. Örneğin: "data_marts.accounting_unit_data_mart, data_marts.marketing_unit_data_mart"
+
+* `method2_transform_mapping`: `transform` edilirken oluşturulacak tabloların isimleri ve o tabloların oluşturulmasında kullanılacak olan tabloların isimlerini barındırdır.
+
+
+`method2_transform_mapping` kısmının ayrıntısı aşağıdaki kısımda verilmiştir.
+
+```json
+{
+    "data_marts.accounting_unit_data_mart": "public.sales_tx_t, public.sales_t",
+}
+```
+
+* Key değeri: `load` işlemi yapılacak tablonın adı ve `"{{schema}}.{{table}}"` şeklinde verilir. Örneğin: `data_marts.accounting_unit_data_mart`
+
+* Value değeri: `load` edilecek tablonun oluşması için gerekli olan tabloların isimlerdir. `"{{schema}}.{{table}}, {{schema}}.{{table}}, ...."` şeklinde yazılır.
+
+
+#### Method2'ye yeni bir sürecin eklenmesi
+
+Method1 için yeni bir sürecin eklenmesi için yapılması gereken iki aşama vardır. 
+
+1. `config.json` dosyasına bu süreci eklemek.
+2. `method_2/transform.py` dosyasına `transform` fonksiyonunun eklenmesi ve `transforms_tasks` `dictionary`'sine eklenmesi. 

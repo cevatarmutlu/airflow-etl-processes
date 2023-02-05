@@ -127,6 +127,8 @@ Programın işlem yapabilmesi için bir veri olması gerekmektedir. `dummy_data.
 <details>
 <summary>dummy_data.py parametreleri</summary>
 
+> Bu parametreler script'in içinden değiştirilebilir.
+
 ```python
 customer_count = 2500 # custormer_t tablosundaki satır sayısı. Müşteri sayısı.
 store_count = 50 # store_t tablosundaki satır sayısı. Mağaza sayısı.
@@ -146,7 +148,7 @@ schema = "public" # veri yazılacak database'in şemasının adı
 
 > Eğer farklı bir `source connection` kullanmıyorsanız script içindeki parametrelere dokunmanıza gerek yoktur.
 
-Aşağıdaki komutu çalıştırarak `source database`'e dummy data ekletmiş olursunuz:
+`source database`'e dummy data eklemek için:
 
 ```
 python3 dummy_data.py
@@ -154,7 +156,7 @@ python3 dummy_data.py
 
 ## Method1 nasıl çalışır hale getirilir?
 
-Birinci metot veritabanından query'ler ile `transform` edilmiş hazır veriyi alır ve `load` işleminin gerçekleştirileceği database'e veriyi yazar.
+Birinci metot, query'ler ile `transform` edilmiş hazır veriyi alır ve `load` işleminin gerçekleştirileceği database'e veriyi yazar.
 
 Bu metot'u çalıştırmak için `dags/method_1/configs.json` dosyasının airflow'a `import` edilmesi gerekmektedir.
 
@@ -162,88 +164,21 @@ Bu metot'u çalıştırmak için `dags/method_1/configs.json` dosyasının airfl
 
 > Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
 
-### config.json
 
-Daha önce dinamik yapısın `Variables` ile sağlandığını ve `Variables` değerlerin ise `config.json` dosyasından geldiğini belirtmiştik. Şimdi JSON dosyasındaki yapının anlamını açıklayalım.
+## Method2 nasıl çalışır hale getirilir?
 
-Method1 için JSON dosyasında 3 temel key değeri bulunmaktadır.
-
-* method1_etl_configs: Method1 için gerekli olan belirli parametreleri barındırır. Load işleminin yapılacağı şemanın ve tablonun adı, `source database`'e çalışacak query ve load tablonun oluşturulması için load tablonun kolonları ve tip değerleri.
-
-* source_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde source database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
-
-* target_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde target database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
-
-```json
-{
-    "method1_etl_configs" : {},
-    "source_connection": "source_connection",
-    "target_connection": "target_connection"
-}
-```
+İkinci yöntemde `etl` süreçleri ayrı ayrı gerçekleştirilir. Method1'deki gibi `extract` ve `transform` işlemleri birlikte yapılmamaktadır.
 
 
-Aşağıda bir tane `method1_etl_configs` değerinin key ve value değerini görmektesiniz. Key değeri verinin yazılacak tablonun adını temsil etmektedir.
+Bu method'u çalıştırmak için `dags/method_2/configs.json` dosyasının airflow'a import edilmesi gerekmektedir.
 
-* query: method1 kaynak veritabanından hazır bir veriyi alıp pandas ile target database'e veriyi basmaktadır. Bu parametre veriyi hazırlayan query'nin kendisidir. query'i parametresi sonucu oluşsan tablo target database'e yazılır.
+<details>
+<summary>import işlemi için</summary>
 
-* write_schema: target database'deki verinin yazılacağı schema'nın adıdır.
+`import` işlemi için `admins`'ın altında bulunan `variables` sayfasını açınız. Daha sonra sol taraftaki `Choose File` butonuna tıklayarak `dags/method_2/configs.json` dosyasını seçiniz ve `Import Variables` butonuna basınız.
+</details>
 
-* write_table: target database'deki verinin yazılacağı table'ın adıdır.
-
-* columns: Eğer load edilecek tablo target database'e yoksa tabloyu oluşturmak için kolon isimlerini buraya yazıyoruz. Buraya create query'side yazılabilirdi niye böyle bir şey yaptım bilmiyorum :)
-
-```json
-"accounting_unit_data_mart": {
-            "query": "select st.paid_price, CAST(st.create_date as DATE) from sales_tx_t stt left join sales_t st on stt.sales_id = st.id where stt.status = true;",
-            "write_schema": "data_marts",
-            "write_table": "accounting_unit_data_mart",
-            "columns": "CREATE_DATE TIMESTAMP NOT null, PAID_PRICE NUMERIC(10, 2) NOT NULL"
-}
-```
-
-### Method1'e yeni bir ekleme yapmak
-
-Method1 için yeni bir load işlemi eklemek için yapmanız gereken sadece `method1_etl_configs` kısmına yeni bir ekleme yapmaktır.
-
-
-## Method2
-
-İkinci metot veritabanından verileri tablolar halinde çeker ve transform işlemini airflow'a bırakır.
-
-Bu metot'u çalıştırmak için dags/method_2/configs.json dosyasının airflow'a import edilmesi gerekmektedir.
-
-`import` işlemi için `admins`'ın altında bulunan `variables` sayfasını açınız. Daha sonra sol taraftaki `Choose File` butonuna tıklayarak `dags/method_1/configs.json` dosyasını seçiniz ve `Import Variables` butonuna basınız. Bu işlemlerden sonra `DAGs` sayfasında `etl_method1` isimli bir DAG görmelisiniz.
+`import` işleminden sonra `DAGs` sayfasında `etl_method2` isimli bir DAG görmelisiniz.
 
 > Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
 
-### config.json
-
-Daha önce dinamik yapısın `Variables` ile sağlandığını ve `Variables` değerlerin ise `config.json` dosyasından geldiğini belirtmiştik. Şimdi JSON dosyasındaki yapının anlamını açıklayalım.
-
-```json
-{
-    "source_connection": "",
-    "target_connection": "",
-    "method2_extract_tables": "", 
-    "method2_transformed_table_names":  "",
-    "method2_transform_mapping": {}
-}
-```
-
-* source_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde source database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
-
-* target_connection: Connections kısmında bulunan Connection Id değeri burada bulunur. Bu variable sayesinde target database'ı değiştirmek için yapmanız gerek şey sadece connection id değerini değiştirmektedir.
-
-* method2_extract_tables: extract edilecek tabloların isimleridir. Tabloların yazılma şekli: "{{schema}}.{{table}}, {{schema}}.{{table}}, ...." Örneğin: "public.sales_tx_t, public.sales_t"
-
-* method2_transformed_table_names: Load edilecek tabloların isimlerdir. Tabloların yazılma şekli: "{{schema}}.{{table}}, {{schema}}.{{table}}, ...." Örneğin: "data_marts.accounting_unit_data_mart, data_marts.marketing_unit_data_mart"
-
-* method2_transform_mapping: transform işleminde kullanılacak verilerin kullanıcılağı extract edilmiş tablolar. key'in yazılma şekli {{schema}}{{table}}. Value'nin ise "{{schema}}.{{table}}, {{schema}}.{{table}}, ...."
-
-
-### Method2'e yeni bir ekleme yapmak
-
-* Eğer yeni tablo kullanılacaksa `method2_extract_tables` kısmına yeni tabloyu ekleyin.
-* Yeni load edilecek tablonun adını `method2_transformed_table_names`'e ekleyin.
-* load edilecek yeni tablonun oluşturulması için gereken tablolar buraya eklenir.

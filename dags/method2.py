@@ -29,7 +29,7 @@ def dag():
 
     tasks = []
     for key, value in json.loads(Variable.get("method2_transform_mapping")).items():
-        print(key, value.split(","))
+
         transform_task = transforms_tasks[key.strip()]
         transformed_data = transform_task(
             *[extract_tasks_dict[i.strip().replace(".", "_")] for i in value.split(",")]

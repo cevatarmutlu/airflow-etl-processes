@@ -278,7 +278,13 @@ Method2 için JSON dosyasında 5 temel key değeri bulunmaktadır.
 
 #### Method2'ye yeni bir sürecin eklenmesi
 
-Method1 için yeni bir sürecin eklenmesi için yapılması gereken iki aşama vardır. 
+Method2'e yeni bir sürecin eklenmesi için yapılması gereken iki aşama vardır. 
 
 1. `config.json` dosyasına bu süreci eklemek.
+    1. Yeni tablo sürece dahil oluyorsa tablonun adının `method2_extract_tables` kısmına eklenmesi.
+    2. `method2_transformed_table_names` kısmına yeni `load` edilecek tablonun adının eklenmesi.
+    3. `method2_transform_mapping` kısmına bu tablonun oluşması için gereken tabloların girilmesi.
 2. `method_2/transform.py` dosyasına `transform` fonksiyonunun eklenmesi ve `transforms_tasks` `dictionary`'sine eklenmesi. 
+    1. `transform.py` dosyasına `transform` işlemini gerçekleştirecek fonksiyon yazılmalıdır. Bu fonksiyonun ismini `airflow` `task` ismi olarak alıcaktır. Bu fonksiyona parametre olarak gerekli tabloların isimleri girilmelidir. Bu tabloların isimleri `method2_transform_mapping` kısmındaki sıra ile ve `schema` kısımları olmadan girilmelidir.
+    2. Yazılan fonksiyonun üst kısmına @task ibaresi eklenmelidir.
+    3. Fonksiyon yazıldıktan sonra en alttaki `transforms_tasks` kısmına fonksiyon eklenmelidir. Buradaki eklemede `key` değeri `method2_transform_mapping` kısmı ile aynı olmalıdır. Value değeri olarak ise sadece fonksiyonun ismi girilmelidir.

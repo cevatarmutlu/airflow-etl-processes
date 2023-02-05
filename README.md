@@ -19,7 +19,8 @@ Bu repo `airflow` kullanılarak iki farklı `etl` süreci gerçekleştirebilir. 
         * [Source Database'in eklenmesi](#source-databasein-eklenmesi)
         * [Target Database'in eklenmesi](#target-databasein-eklenmesi)
     * [Dummy verinin oluşturulması](#dummy-verinin-oluşturulması)
-    * [Method1'in çalıştırılması]()
+    * [Method1](#method1)
+    * [Method2](#method2)
 
 
 ## Kullanılan Teknolojiler
@@ -172,7 +173,7 @@ Bu metot'u çalıştırmak için `dags/method_1/configs.json` dosyasının airfl
 > Eğer göremediyseniz biraz bekleyip sayfası yenileyin.
 
 
-## Method2 nasıl çalışır hale getirilir?
+## Method2
 
 İkinci yöntemde `etl` süreçleri ayrı ayrı gerçekleştirilir. Method1'deki gibi `extract` ve `transform` işlemleri birlikte yapılmamaktadır.
 

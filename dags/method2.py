@@ -30,7 +30,10 @@ def dag():
     tasks = []
     for key, value in json.loads(Variable.get("method2_transform_mapping")).items():
         print(key, value.split(","))
-        transformed_data = transforms_tasks[key.strip()](*[extract_tasks_dict[i.strip().replace(".", "_")] for i in value.split(",")])
+        transform_task = transforms_tasks[key.strip()]
+        transformed_data = transform_task(
+            *[extract_tasks_dict[i.strip().replace(".", "_")] for i in value.split(",")]
+        )
         truncate_task = truncate_tasks[key.strip()](engine_target, key.strip(), transformed_data)
         load_task_result = load_tasks[key.strip()](truncate_task, engine_target, key.strip())
         
